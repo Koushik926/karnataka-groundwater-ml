@@ -190,7 +190,7 @@ def build_docx(name: str, srn: str) -> Path:
     h(doc, "1. Print and bring - six items, all yours alone")
     for item in [
         f"Project report, hard copy - Phase1_Report_{safe}.pdf  (34 pages)",
-        f"Internship report, hard copy - Internship_Report_{safe}.pdf  (12 pages)",
+        f"Internship report, hard copy - Internship_Report_{safe}.pdf  (13 pages)",
         f"Guide evaluation sheet, Project - Evaluation_Sheets/{safe}/GuideEvaluation-Project-2026_{safe}.docx",
         f"Examiner evaluation sheet, Project - Evaluation_Sheets/{safe}/ExaminerEvaluation-Project-2026_{safe}.docx",
         f"Guide evaluation sheet, Internship - Evaluation_Sheets/{safe}/GuideEvaluation-Internship-2026_{safe}.docx",
@@ -275,7 +275,7 @@ def build_md(name: str, srn: str) -> Path:
          "separate coordinators, separate 50-mark sheets.", "",
          "## 1. Print and bring — six items", ""]
     L += [f"- [ ] Project report — `Phase1_Report_{safe}.pdf` (34 pages)",
-          f"- [ ] Internship report — `Internship_Report_{safe}.pdf` (12 pages)",
+          f"- [ ] Internship report — `Internship_Report_{safe}.pdf` (13 pages)",
           f"- [ ] Guide sheet, Project — `Evaluation_Sheets/{safe}/GuideEvaluation-Project-2026_{safe}.docx`",
           f"- [ ] Examiner sheet, Project — `Evaluation_Sheets/{safe}/ExaminerEvaluation-Project-2026_{safe}.docx`",
           f"- [ ] Guide sheet, Internship — `Evaluation_Sheets/{safe}/GuideEvaluation-Internship-2026_{safe}.docx`",

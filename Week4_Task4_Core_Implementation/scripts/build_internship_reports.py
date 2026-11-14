@@ -331,6 +331,27 @@ GUIDE_FEEDBACK = [
 ]
 
 
+
+def _deck_reflections() -> dict:
+    """Technical growth / professional growth / challenge, read from the deck builder.
+
+    The internship template asks for the same three headings in report 3.3 and on
+    deck slide 7. They are written once, in presentation/build_internship_deck.py,
+    and read here, so the report and the deck cannot drift apart.
+    """
+    import importlib.util
+    spec = importlib.util.spec_from_file_location(
+        "_deck", ROOT / "presentation" / "build_internship_deck.py")
+    try:
+        m = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(m)
+        return {k: (d["tech"], d["prof"], d["chall"]) for k, d in m.S.items()}
+    except Exception:
+        return {}
+
+
+REFLECTIONS = _deck_reflections()
+
 # ------------------------------------------------------------------ docx bits
 def shade(cell, hexc):
     tcPr = cell._tc.get_or_add_tcPr()
@@ -365,12 +386,10 @@ def build(stu: dict) -> Path:
     for s in doc.sections:
         s.top_margin = s.bottom_margin = Cm(2.2); s.left_margin = s.right_margin = Cm(2.2)
 
-    centred(doc, "REVA UNIVERSITY", 17, True)
+    centred(doc, "REVA University", 16, True)
     centred(doc, "School of Computer Science and Engineering", 12)
-    centred(doc, "Center for Artificial Intelligence & Machine Learning (CAIML)", 12)
     doc.add_paragraph()
-    centred(doc, "INTERNSHIP REPORT — PHASE-1", 14, True)
-    centred(doc, "REVA Internship Opportunities (RIO)  ·  Review date 14 November 2026", 11)
+    centred(doc, "Internship Report -Phase-1", 14, True)
     doc.add_paragraph()
 
     centred(doc, "Student and Internship Details", 12, True)
@@ -378,13 +397,8 @@ def build(stu: dict) -> Path:
         ["Student name", stu["name"]],
         ["SRN / Roll number", stu["srn"]],
         ["Program and Section", P.program(stu["name"])],
-        ["Organization", "REVA University"],
-        ["Workplace mentor (name, designation)",
-         f"{LEAD} — Center Lead, CAIML, School of CSE"],
-        ["Faculty mentor", GUIDE],
-        ["Internship module", stu["module"]],
-        ["Problem statement ID", PSID],
-        ["Report generated", f"{date.today():%d %B %Y}"],
+        ["Project title", TITLE],
+        ["Faculty guide", GUIDE],
     ], fs=10.5)
     doc.add_page_break()
 
@@ -475,6 +489,15 @@ def build(stu: dict) -> Path:
     table(doc, ["Tool", "Used for", "Remarks"], TOOLS, fs=9.5)
 
     # ================================================================ 4
+    doc.add_page_break()
+    doc.add_heading("3.3 Reflection and key learnings", 2)
+    blocks = REFLECTIONS.get(stu["name"])
+    if blocks:
+        for raw in blocks:
+            head, _, body = raw.partition("\n")
+            h = doc.add_paragraph(); h.add_run(head.strip()).bold = True
+            doc.add_paragraph(body.strip())
+
     doc.add_page_break()
     doc.add_heading("4. Guide Feedback and Professional Conduct", 1)
 

@@ -9,7 +9,7 @@ Two separate evaluations that afternoon — Internship and Major Project — sep
 ## 1. Print and bring — six items
 
 - [ ] Project report — `Phase1_Report_G_M_CHANDRASHEKAR.pdf` (34 pages)
-- [ ] Internship report — `Internship_Report_G_M_CHANDRASHEKAR.pdf` (12 pages)
+- [ ] Internship report — `Internship_Report_G_M_CHANDRASHEKAR.pdf` (13 pages)
 - [ ] Guide sheet, Project — `Evaluation_Sheets/G_M_CHANDRASHEKAR/GuideEvaluation-Project-2026_G_M_CHANDRASHEKAR.docx`
 - [ ] Examiner sheet, Project — `Evaluation_Sheets/G_M_CHANDRASHEKAR/ExaminerEvaluation-Project-2026_G_M_CHANDRASHEKAR.docx`
 - [ ] Guide sheet, Internship — `Evaluation_Sheets/G_M_CHANDRASHEKAR/GuideEvaluation-Internship-2026_G_M_CHANDRASHEKAR.docx`

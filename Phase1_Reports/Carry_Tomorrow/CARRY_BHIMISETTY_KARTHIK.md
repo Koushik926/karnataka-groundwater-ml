@@ -9,7 +9,7 @@ Two separate evaluations that afternoon — Internship and Major Project — sep
 ## 1. Print and bring — six items
 
 - [ ] Project report — `Phase1_Report_BHIMISETTY_KARTHIK.pdf` (34 pages)
-- [ ] Internship report — `Internship_Report_BHIMISETTY_KARTHIK.pdf` (12 pages)
+- [ ] Internship report — `Internship_Report_BHIMISETTY_KARTHIK.pdf` (13 pages)
 - [ ] Guide sheet, Project — `Evaluation_Sheets/BHIMISETTY_KARTHIK/GuideEvaluation-Project-2026_BHIMISETTY_KARTHIK.docx`
 - [ ] Examiner sheet, Project — `Evaluation_Sheets/BHIMISETTY_KARTHIK/ExaminerEvaluation-Project-2026_BHIMISETTY_KARTHIK.docx`
 - [ ] Guide sheet, Internship — `Evaluation_Sheets/BHIMISETTY_KARTHIK/GuideEvaluation-Internship-2026_BHIMISETTY_KARTHIK.docx`

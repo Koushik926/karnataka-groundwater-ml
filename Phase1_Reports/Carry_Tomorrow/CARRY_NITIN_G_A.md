@@ -9,7 +9,7 @@ Two separate evaluations that afternoon — Internship and Major Project — sep
 ## 1. Print and bring — six items
 
 - [ ] Project report — `Phase1_Report_NITIN_G_A.pdf` (34 pages)
-- [ ] Internship report — `Internship_Report_NITIN_G_A.pdf` (12 pages)
+- [ ] Internship report — `Internship_Report_NITIN_G_A.pdf` (13 pages)
 - [ ] Guide sheet, Project — `Evaluation_Sheets/NITIN_G_A/GuideEvaluation-Project-2026_NITIN_G_A.docx`
 - [ ] Examiner sheet, Project — `Evaluation_Sheets/NITIN_G_A/ExaminerEvaluation-Project-2026_NITIN_G_A.docx`
 - [ ] Guide sheet, Internship — `Evaluation_Sheets/NITIN_G_A/GuideEvaluation-Internship-2026_NITIN_G_A.docx`
