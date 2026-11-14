@@ -8,7 +8,7 @@ Two separate evaluations that afternoon — Internship and Major Project — sep
 
 ## 1. Print and bring — six items
 
-- [ ] Project report — `Phase1_Report_R_KOUSHIK.pdf` (22 pages)
+- [ ] Project report — `Phase1_Report_R_KOUSHIK.pdf` (34 pages)
 - [ ] Internship report — `Internship_Report_R_KOUSHIK.pdf` (12 pages)
 - [ ] Guide sheet, Project — `Evaluation_Sheets/R_KOUSHIK/GuideEvaluation-Project-2026_R_KOUSHIK.docx`
 - [ ] Examiner sheet, Project — `Evaluation_Sheets/R_KOUSHIK/ExaminerEvaluation-Project-2026_R_KOUSHIK.docx`

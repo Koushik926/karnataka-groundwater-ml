@@ -20,7 +20,7 @@ for both.
 | 2 | Examiner evaluation sheet — Project | `Evaluation_Sheets/<NAME>/ExaminerEvaluation-Project-2026_<NAME>.docx` | Yes, 1 copy |
 | 3 | Guide evaluation sheet — Internship | `Evaluation_Sheets/<NAME>/GuideEvaluation-Internship-2026_<NAME>.docx` | Yes, 1 copy |
 | 4 | Examiner evaluation sheet — Internship | `Evaluation_Sheets/<NAME>/ExaminerEvaluation-Internship-2026_<NAME>.docx` | Yes, 1 copy |
-| 5 | Project report, hard copy | `Phase1_Report_<NAME>.pdf` (22 pages) | Yes |
+| 5 | Project report, hard copy | `Phase1_Report_<NAME>.pdf` (34 pages) | Yes |
 | 6 | Internship report, hard copy | `Internship_Report_<NAME>.pdf` (12 pages) | Yes |
 
 Plus, on the laptop, **two decks**:

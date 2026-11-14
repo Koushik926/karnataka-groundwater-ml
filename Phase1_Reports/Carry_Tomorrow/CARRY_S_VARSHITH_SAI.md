@@ -8,7 +8,7 @@ Two separate evaluations that afternoon — Internship and Major Project — sep
 
 ## 1. Print and bring — six items
 
-- [ ] Project report — `Phase1_Report_S_VARSHITH_SAI.pdf` (22 pages)
+- [ ] Project report — `Phase1_Report_S_VARSHITH_SAI.pdf` (34 pages)
 - [ ] Internship report — `Internship_Report_S_VARSHITH_SAI.pdf` (12 pages)
 - [ ] Guide sheet, Project — `Evaluation_Sheets/S_VARSHITH_SAI/GuideEvaluation-Project-2026_S_VARSHITH_SAI.docx`
 - [ ] Examiner sheet, Project — `Evaluation_Sheets/S_VARSHITH_SAI/ExaminerEvaluation-Project-2026_S_VARSHITH_SAI.docx`

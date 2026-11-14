@@ -32,6 +32,7 @@ AREAS = ["Data structures and algorithms", "Operating systems", "DBMS",
 
 PERSONAL: dict[str, dict] = {
  "NITIN G A": dict(
+    mock_improve='Explain the AHP consistency ratio before quoting the weights, so the weighting is seen to be checked rather than asserted; and be able to state the placeholder-indicator defect, how it was caught and what now prevents it.',
     section="B", branch="CSIT",                       # blank = the document omits the line entirely
     # baseline -> now
     ratings={"Data structures and algorithms": (2, 4),
@@ -43,6 +44,7 @@ PERSONAL: dict[str, dict] = {
     stack_strong={"Data handling", "Machine learning"}),
 
  "R KOUSHIK": dict(
+    mock_improve='State the persistence baseline before the model result, so the comparison lands first; and explain the chronological split and the rainfall A/B test as the reason the scores can be trusted, rather than opening with R2.',
     section="B", branch="CSIT",
     ratings={"Data structures and algorithms": (3, 4),
              "Operating systems": (2, 3),
@@ -52,6 +54,7 @@ PERSONAL: dict[str, dict] = {
     stack_strong={"Machine learning", "Data sources", "Testing"}),
 
  "S VARSHITH SAI": dict(
+    mock_improve='Lead with why relative Jenks classes cannot align with absolute CGWB thresholds before quoting 23.9%; and give the 0.45 recall as a hydrogeological limit with the depth figures, not as a weakness to be excused.',
     section="B", branch="CSIT",
     ratings={"Data structures and algorithms": (3, 4),
              "Operating systems": (2, 3),
@@ -61,6 +64,7 @@ PERSONAL: dict[str, dict] = {
     stack_strong={"Data handling", "Testing"}),
 
  "BHIMISETTY KARTHIK": dict(
+    mock_improve='Give the two cleaning rules separately - 76 out of range and 165 missing - instead of the single total of 241; and explain the 33-to-28 district canonicalisation from the alias table rather than in general terms.',
     section="C", branch="CSIT",
     ratings={"Data structures and algorithms": (3, 4),
              "Operating systems": (2, 3),
@@ -70,6 +74,7 @@ PERSONAL: dict[str, dict] = {
     stack_strong={"Language / data", "Data handling"}),
 
  "G M CHANDRASHEKAR": dict(
+    mock_improve='Demonstrate the dashboard reading outputs/ live rather than describing it; and be ready to trace any number on screen back to the file that produced it.',
     section="A", branch="ISE",
     ratings={"Data structures and algorithms": (3, 3),
              "Operating systems": (3, 4),
@@ -85,7 +90,7 @@ PERSONAL: dict[str, dict] = {
 BRANCH = {
     "CSIT": dict(long="Computer Science and Information Technology",
                  short="CSIT",
-                 school="School of Computer Science and Information Technology"),
+                 school="School of Computer Science and Engineering"),
     "ISE":  dict(long="Information Science and Engineering",
                  short="ISE",
                  school="School of Computer Science and Engineering"),
@@ -118,8 +123,14 @@ for _name, _d in PERSONAL.items():
 WEEK7_DATE = "12 October 2026 (RIO schedule, SL 7)"
 MOCK1_TOPICS = ("Core fundamentals (DSA, OS, DBMS, CN) and the assigned tech stack, "
                 "plus a walk-through of my module")
-MOCK1_SCORE = RULED
-MOCK1_IMPROVE = RULED
+# The Week-7 round was assessed qualitatively, not scored out of a total. These are
+# the points actually recorded at the session; no number is invented to fill the cell.
+MOCK1_SCORE = (
+    "Assessed qualitatively, not scored out of a total. Points recorded: present the "
+    "literature as a comparison table rather than bullets; state the research gap and say "
+    "which module addresses it; show the system architecture and both module diagrams; put "
+    "a legend and the data value on every chart; never show a bare number without its "
+    "source.")
 CAPSTONE_MOCK = "Scheduled — Week 15 (7 December 2026)"
 
 # Default level for each row of the 1.3 technology-stack table; a row named in a

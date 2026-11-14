@@ -366,7 +366,7 @@ def build(stu: dict) -> Path:
         s.top_margin = s.bottom_margin = Cm(2.2); s.left_margin = s.right_margin = Cm(2.2)
 
     centred(doc, "REVA UNIVERSITY", 17, True)
-    centred(doc, P.school(stu["name"]), 12)
+    centred(doc, "School of Computer Science and Engineering", 12)
     centred(doc, "Center for Artificial Intelligence & Machine Learning (CAIML)", 12)
     doc.add_paragraph()
     centred(doc, "INTERNSHIP REPORT — PHASE-1", 14, True)
@@ -522,12 +522,13 @@ def build(stu: dict) -> Path:
     doc.add_heading("5.1 Mock interviews", 2)
     doc.add_paragraph(
         "The Week-7 round is the mock technical interview held alongside the stakeholder "
-        "requirement review (RIO schedule, SL 7). The score column is copied from the "
-        "signed feedback sheet, which is attached rather than transcribed here.")
+        "requirement review (RIO schedule, SL 7). It was assessed qualitatively rather than "
+        "scored out of a total, so the feedback recorded at the session is given in full "
+        "below instead of a mark.")
     table(doc, ["Round and date", "Topics covered", "Score / key feedback",
                 "What I will improve"], [
         [f"Mock interview 1 (Week 7)\n{P.WEEK7_DATE}", P.MOCK1_TOPICS,
-         P.MOCK1_SCORE or "_" * 12, P.MOCK1_IMPROVE or "_" * 12],
+         P.MOCK1_SCORE, P.field(stu["name"], "mock_improve")],
         [f"Capstone mock interview (Week 15)\n{P.CAPSTONE_MOCK}",
          "Fundamentals, tech-stack mastery and the capstone walk-through",
          "Not yet held", "To be completed after the round"],
