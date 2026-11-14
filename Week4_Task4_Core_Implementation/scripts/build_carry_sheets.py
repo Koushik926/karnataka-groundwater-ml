@@ -246,17 +246,20 @@ def build_docx(name: str, srn: str) -> Path:
     h(doc, "7. If they ask to see it running")
     for cmd, what in [
         ("cd Week4_Task4_Core_Implementation", ""),
-        ("streamlit run dashboard.py", "map, station forecasts, CGWB validation"),
-        ("python -m pytest tests/", "29 passed"),
-        ("python -m src.main", "the whole pipeline, about 3 minutes"),
+        ("python3 -m venv .venv", "ONCE, before you leave home"),
+        (".venv/bin/python -m pip install -r requirements.txt", "takes under a minute"),
+        (".venv/bin/python -m streamlit run dashboard.py", "map, forecasts, validation"),
+        (".venv/bin/python -m pytest tests/", "29 passed, under 10 s"),
+        (".venv/bin/python -m src.main", "the whole pipeline, about 30 seconds"),
     ]:
         p = doc.add_paragraph()
         r = p.add_run(cmd); r.font.name = "Consolas"; r.font.size = Pt(10)
         if what:
             r2 = p.add_run(f"     # {what}"); r2.font.size = Pt(9.5); r2.italic = True
         p.paragraph_format.space_after = Pt(1)
-    para(doc, "Run all three once tonight. A command that fails in the room costs more than "
-              "a slide that is missing.", italic=True)
+    para(doc, "Set the venv up and run all three BEFORE you leave. A command that fails in "
+              "the room costs more than a slide that is missing. If it breaks anyway, "
+              "DEMO_RUNBOOK.md has the fallback for each error.", italic=True)
 
     OUT.mkdir(parents=True, exist_ok=True)
     out = OUT / f"CARRY_{safe}.docx"
@@ -315,9 +318,14 @@ def build_md(name: str, srn: str) -> Path:
           "shallow-well index cannot see). Saying this first is stronger than being asked.",
           "", "## 7. If they ask to see it running", "", "```",
           "cd Week4_Task4_Core_Implementation",
-          "streamlit run dashboard.py        # map, station forecasts, CGWB validation",
-          "python -m pytest tests/           # 29 passed",
-          "python -m src.main                # whole pipeline, ~3 minutes", "```", "",
+          "python3 -m venv .venv                              # ONCE, before you leave",
+          ".venv/bin/python -m pip install -r requirements.txt",
+          ".venv/bin/python -m streamlit run dashboard.py     # the demo",
+          ".venv/bin/python -m pytest tests/                  # 29 passed, under 10 s",
+          ".venv/bin/python -m src.main                       # whole pipeline, ~30 s",
+          "```", "",
+          "Bare `python3` is missing xgboost and pytest on this machine, so the venv "
+          "is not optional. Full fallbacks in `DEMO_RUNBOOK.md`.", "",
           "Run all three tonight. A command that fails in the room costs more than a missing "
           "slide.", ""]
     OUT.mkdir(parents=True, exist_ok=True)

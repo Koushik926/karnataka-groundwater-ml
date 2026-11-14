@@ -496,7 +496,7 @@ def build(name: str, srn: str, module: int) -> Path:
     add_table(s, Inches(0.55), Inches(3.05), Inches(12.2), Inches(3.3), tests,
               col_w=[13, 11, 22, 23, 21, 10], font=9.5)
     textbox(s, Inches(0.55), Inches(6.50), Inches(12.2), Inches(0.4),
-            "Run with: python -m pytest tests/   →   29 passed in 3.9 s. "
+            "Run with: python -m pytest tests/   →   29 passed in under 10 s. "
             "8 of the 29 are shown here; all 29 are listed in the report, and 16 of them are "
             "regression tests tied to a specific defect we fixed.",
             size=11, italic=True, color=GREY)

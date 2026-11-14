@@ -73,9 +73,13 @@ The two weak numbers, with the answer ready rather than avoided: four-class agre
 
 ```
 cd Week4_Task4_Core_Implementation
-streamlit run dashboard.py        # map, station forecasts, CGWB validation
-python -m pytest tests/           # 29 passed
-python -m src.main                # whole pipeline, ~3 minutes
+python3 -m venv .venv                              # ONCE, before you leave
+.venv/bin/python -m pip install -r requirements.txt
+.venv/bin/python -m streamlit run dashboard.py     # the demo
+.venv/bin/python -m pytest tests/                  # 29 passed, under 10 s
+.venv/bin/python -m src.main                       # whole pipeline, ~30 s
 ```
+
+Bare `python3` is missing xgboost and pytest on this machine, so the venv is not optional. Full fallbacks in `DEMO_RUNBOOK.md`.
 
 Run all three tonight. A command that fails in the room costs more than a missing slide.

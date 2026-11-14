@@ -48,7 +48,7 @@ If the examiner asks to see it running:
 cd Week4_Task4_Core_Implementation
 streamlit run dashboard.py        # map, station forecasts, CGWB validation
 python -m pytest tests/           # 29 passed
-python -m src.main                # whole pipeline, ~3 minutes
+python -m src.main                # whole pipeline, ~30 seconds
 ```
 
 ## The five numbers to know cold

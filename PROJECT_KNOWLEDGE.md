@@ -114,7 +114,7 @@ The decline-rate indicator comes from the **measured** Sen's slope, not from the
 
 ## Testing and defects
 
-29 tests, 29 passing, 0 failing (`python -m pytest tests/`, 3.9 s). Functional, boundary and negative cases for both modules, one end-to-end integration test, and 16 regression tests each tied to a specific defect. The original 13 tests all ran on generated data and caught none of the real bugs, which is why the suite was rebuilt around real data.
+29 tests, 29 passing, 0 failing (`python -m pytest tests/`, under 10 s). Functional, boundary and negative cases for both modules, one end-to-end integration test, and 16 regression tests each tied to a specific defect. The original 13 tests all ran on generated data and caught none of the real bugs, which is why the suite was rebuilt around real data.
 
 Defects that produced **no error message** — this is the honest part of the story:
 
@@ -202,7 +202,7 @@ Completion is stated as 70%, matching the Phase-1 target, because four planned c
 ## Running it
 
 ```
-python -m src.main                        # both modules, ~3 min, writes outputs/ and models/
+python -m src.main                        # both modules, ~30 s, writes outputs/ and models/
 python -m pytest tests/                   # 29 passed
 python notebooks/make_figures.py          # all 12 figures
 python experiments/ab_rainfall.py         # the rainfall A/B result

@@ -193,7 +193,7 @@ STUDENTS = [
           "tie correction - an O(n^2) pairwise comparison run over 2,042 stations.",
         "Operating systems":
           "Learned to reason about memory and run time on a 123,632-row join rather than "
-          "guessing; the whole pipeline now runs in about three minutes on a laptop.",
+          "guessing; the whole pipeline now runs in under a minute on a laptop (measured: 30 s).",
         "DBMS":
           "Merged two CGWB exports into one keyed table, designed the cleaning rules, and "
           "wrote the alias tables that resolve renamed districts.",

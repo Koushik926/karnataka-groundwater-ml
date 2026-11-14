@@ -210,7 +210,7 @@ def main() -> Path:
     # ---------------------------------------------------------------- testing
     A("## Testing and defects")
     A("")
-    A("29 tests, 29 passing, 0 failing (`python -m pytest tests/`, 3.9 s). Functional, "
+    A("29 tests, 29 passing, 0 failing (`python -m pytest tests/`, under 10 s). Functional, "
       "boundary and negative cases for both modules, one end-to-end integration test, and "
       "16 regression tests each tied to a specific defect. The original 13 tests all ran "
       "on generated data and caught none of the real bugs, which is why the suite was "
@@ -313,7 +313,7 @@ def main() -> Path:
     A("## Running it")
     A("")
     A("```")
-    A("python -m src.main                        # both modules, ~3 min, writes outputs/ and models/")
+    A("python -m src.main                        # both modules, ~30 s, writes outputs/ and models/")
     A("python -m pytest tests/                   # 29 passed")
     A("python notebooks/make_figures.py          # all 12 figures")
     A("python experiments/ab_rainfall.py         # the rainfall A/B result")

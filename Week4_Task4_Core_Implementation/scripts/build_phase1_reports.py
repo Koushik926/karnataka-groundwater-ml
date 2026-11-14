@@ -319,7 +319,7 @@ def build(stu: dict, D: dict) -> Path:
         ["R6", "Every reported number shall be reproducible from a single command.",
          "Non-functional", "High", "Met"],
         ["R7", "The system should run end to end on a laptop in under five minutes "
-         "without a GPU.", "Non-functional", "Medium", "Met (about 3 min)"],
+         "without a GPU.", "Non-functional", "Medium", "Met (about 30 s)"],
         ["R8", "The system should produce a continuous risk surface by spatial "
          "interpolation.", "Functional", "Low", "Phase 2"],
         ["R9", "The system shall fail loudly on a missing or invalid data file rather "
@@ -867,7 +867,7 @@ def build(stu: dict, D: dict) -> Path:
 
     doc.add_heading("4.2 Test summary", 2)
     table(doc, ["Total test cases", "Passed", "Failed", "Run time"],
-          [["29", "29", "0", "3.9 s"]], fs=10.5)
+          [["29", "29", "0", "under 10 s"]], fs=10.5)
     doc.add_paragraph(
         "Coverage was aimed at behaviour rather than lines: every public function of both "
         "modules, every published statistic, and every defect in section 4.3 has at least "
@@ -1122,7 +1122,7 @@ def build(stu: dict, D: dict) -> Path:
          "Mann-Kendall with Sen's slope per station: O(n squared) in the readings per "
          "station, about 45 quarters giving roughly 1,000 comparisons, run over 2,042 "
          "stations. XGBoost training is O(trees x depth x rows). The whole pipeline runs in "
-         "about three minutes on a laptop with no GPU."),
+         "under a minute on a laptop with no GPU (measured: 30 s)."),
         ("How do you know no number in this report is made up?",
          "Every number is read from models/ and outputs/ when the document is built, and "
          "src/provenance.py refuses to build any document if the model metadata does not "
