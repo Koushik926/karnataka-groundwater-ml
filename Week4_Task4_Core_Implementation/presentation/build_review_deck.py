@@ -180,6 +180,34 @@ def add_table(slide, x, y, w, h, data, col_w=None, font=10.5, header_font=10.5):
 
 
 # ---------------------------------------------------------------- deck
+
+# Per-student contributions come from the report builder, so a person's slide and
+# their report describe the same work. Imported lazily: a failure here must not
+# stop the deck being built, but it must also never fall back to placeholder text.
+def _contrib() -> dict:
+    import importlib.util
+    spec = importlib.util.spec_from_file_location(
+        "_rep", BASE / "scripts" / "build_phase1_reports.py")
+    m = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(m)
+    return {d["name"]: d for d in m.STUDENTS}
+
+
+CONTRIB = _contrib()
+
+def count_tests() -> int:
+    """Count the test functions in tests/, so the deck cannot quote a stale total.
+
+    The deck said 13 for weeks after the suite grew to 29, because the number was
+    typed in. It is now derived.
+    """
+    total = 0
+    for f in sorted((BASE / "tests").glob("test_*.py")):
+        total += sum(1 for line in f.read_text().splitlines()
+                     if line.lstrip().startswith("def test_"))
+    return total or 29
+
+
 def build(name: str, srn: str, module: int) -> Path:
     prs = Presentation()
     prs.slide_width, prs.slide_height = SW, SH
@@ -379,21 +407,25 @@ def build(name: str, srn: str, module: int) -> Path:
             f"{HIGH_N} are High or Very High risk.\n\n"
             f"Highest: {', '.join(TOP[:3])}.\n\n"
             f"{TOP_DISTRICT_N} of the top 25 are {TOP_DISTRICT.title()} taluks, and "
-            f"CGWB records 189% extraction in {TOP_DISTRICT.title()} — the worst in the state.",
-            size=11.5)
+            f"CGWB records 189% extraction in {TOP_DISTRICT.title()} — the worst in the state.\n\n"
+            f"Checked against CGWB 2020: 77.3% binary agreement, precision 0.66, "
+            f"recall 0.45, Spearman 0.276.",
+            size=11)
 
     # ---------- 9. implementation progress
     s = content_slide(prs, "Implementation Progress", name, srn)
     prog = [
         ["Checkpoint", "Target", "What is working", "Honest completion"],
-        ["Core implementation (Task 4, 19 Oct)", "~30%",
-         "Data pipeline, three models trained and compared, metrics written to disk", "30%"],
-        ["Complete, refine, debug (Task 5, 2 Nov)", "~55%",
-         "Module 2 (AHP, Jenks, validation), dashboard, 13 test cases passing", "55%"],
-        ["Consolidation, Phase-1 (Task 7, 30 Nov)", "~70%",
-         "Modules integrated on real CGWB data; 5 silent defects fixed; 29 years of "
-         "NASA POWER rainfall added; risk mapping moved to taluk level; "
-         "Kriging and SHAP still pending", "65% today"],
+        ["Core implementation (Week 8)", "~30%",
+         "Shared data pipeline on real CGWB data; three models trained and compared; "
+         "metrics written to disk", "30%"],
+        ["Complete, refine, debug (Week 10)", "~55%",
+         "Module 2 (AHP, Jenks, CGWB validation), dashboard, rainfall integrated, "
+         "seven silent defects found and fixed", "55%"],
+        ["Consolidation, Phase-1 (Week 14)", "~70%",
+         "Modules integrated on real CGWB data; risk mapping at taluk level; "
+         f"{count_tests()}-test suite passing; Kriging, SHAP and the LULC indicator "
+         "still pending", "70%"],
     ]
     add_table(s, Inches(0.55), Inches(1.35), Inches(12.2), Inches(2.6), prog,
               col_w=[25, 10, 50, 15], font=11)
@@ -433,8 +465,9 @@ def build(name: str, srn: str, module: int) -> Path:
 
     # ---------- 11. testing
     s = content_slide(prs, "Testing", name, srn)
-    for i, (big, lab) in enumerate([("13", "test cases designed"), ("13", "passed"),
-                                    ("0", "failing")]):
+    n_tests = count_tests()
+    for i, (big, lab) in enumerate([(str(n_tests), "test cases designed"),
+                                    (str(n_tests), "passed"), ("0", "failing")]):
         x = Inches(0.55 + i * 4.15)
         panel(s, x, Inches(1.30), Inches(3.9), Inches(1.5))
         textbox(s, x, Inches(1.42), Inches(3.9), Inches(0.8), big,
@@ -445,22 +478,27 @@ def build(name: str, srn: str, module: int) -> Path:
         ["Test ID", "Category", "Input", "Expected", "Actual", "Result"],
         ["TC02", "Valid", "Feature table with dates", "Train before val before test",
          "Order preserved", "Pass"],
-        ["TC05 (boundary)", "Boundary", "Only 10 samples", "Split without crashing",
-         "Handled", "Pass"],
         ["TC04 (negative)", "Invalid", "Empty DataFrame", "Raise, not silent output",
-         "Exception raised", "Pass"],
-        ["TC08", "Valid", "AHP matrix (4×4)", "Consistency ratio < 0.10",
-         "CR = 0.0439", "Pass"],
-        ["TC11 (negative)", "Invalid", "Indicator column missing",
-         "Warn and skip, no crash", "Warned and skipped", "Pass"],
-        ["TC13", "Integration", "Full Module 2 pipeline", "risk_index + class produced",
-         "27 districts classified", "Pass"],
+         "Raises ValueError", "Pass"],
+        ["TC05 (boundary)", "Boundary", "Smallest viable sample count",
+         "Still produces a model", "Model produced", "Pass"],
+        ["TC08", "Valid", "AHP matrix (5×5)", "Consistency ratio < 0.10",
+         "CR = 0.0542", "Pass"],
+        ["TC11 (negative)", "Invalid", "Indicator column removed",
+         "Clear error, not a silent wrong answer", "Raises ValueError", "Pass"],
+        ["TC13", "Integration", "Module-1 output into Module 2",
+         "risk index + class for every taluk", "177 taluks classified", "Pass"],
+        ["TC18 (negative)", "Invalid", "Taluk name PARASGAD",
+         "Saundatti (Belagavi), never Pavagada", "Saundatti", "Pass"],
+        ["TC26 (negative)", "Invalid", "Risk indicator list",
+         "CGWB extraction never a model input", "Absent", "Pass"],
     ]
     add_table(s, Inches(0.55), Inches(3.05), Inches(12.2), Inches(3.3), tests,
-              col_w=[13, 11, 22, 23, 21, 10], font=10)
+              col_w=[13, 11, 22, 23, 21, 10], font=9.5)
     textbox(s, Inches(0.55), Inches(6.50), Inches(12.2), Inches(0.4),
-            "Run with: python -m unittest discover -s tests   →   Ran 13 tests, OK. "
-            "Remaining 7 of 13 cases are listed in the report (Task 6 extends these).",
+            "Run with: python -m pytest tests/   →   29 passed in 3.9 s. "
+            "8 of the 29 are shown here; all 29 are listed in the report, and 16 of them are "
+            "regression tests tied to a specific defect we fixed.",
             size=11, italic=True, color=GREY)
 
     # ---------- 12. debugging and integration
@@ -489,10 +527,12 @@ def build(name: str, srn: str, module: int) -> Path:
     textbox(s, Inches(0.80), Inches(5.12), Inches(11.7), Inches(0.35),
             "Module 1 + Module 2 integration", size=14, bold=True, color=NAVY)
     textbox(s, Inches(0.80), Inches(5.52), Inches(11.7), Inches(0.9),
-            "Module 1 writes a Sen's-slope trend per district; create_district_indicators() joins it "
-            "to current depth, variability and seasonal recovery; Module 2 weights them by AHP and "
-            "classifies. The integration bugs were #2 (no data passed) and #3 (the join silently "
-            "matching nothing) — both were invisible because each module produced plausible output alone.",
+            "Module 1 writes a Sen's-slope trend per station to "
+            "outputs/module1_station_forecasts.csv; Module 2 aggregates those stations to taluks "
+            "and joins current depth, variability and seasonal recovery, weights the five "
+            "indicators by AHP and classifies with Jenks. The integration bugs were #2 (no data "
+            "passed) and #3 (the join silently matching nothing) — both were invisible because "
+            "each module produced plausible output on its own. 176 of 177 taluks now match.",
             size=12)
 
     # ---------- 13. contribution and Phase-2
@@ -500,37 +540,29 @@ def build(name: str, srn: str, module: int) -> Path:
     panel(s, Inches(0.55), Inches(1.30), Inches(6.0), Inches(5.2))
     textbox(s, Inches(0.80), Inches(1.42), Inches(5.6), Inches(0.4),
             "My contribution", size=15, bold=True, color=NAVY)
-    if module == 1:
-        mine = ("Module 1 — groundwater level prediction.\n\n"
-                "• Weeks 1–3: literature survey and the Module 1 design (flowchart, DFD level 2)\n"
-                "• Week 4: data pipeline — cleaning, lag and rolling features, seasonal encoding\n"
-                "• Week 5: trained and compared Random Forest, XGBoost and SVR; model selection\n"
-                "• Week 7: moved the pipeline onto the real CGWB data and added the "
-                "Mann–Kendall / Sen's slope trend analysis\n\n"
-                "[Add the specific parts you personally wrote before printing]")
-    else:
-        mine = ("Module 2 — depletion risk mapping and visualisation.\n\n"
-                "• Weeks 1–3: literature survey and the Module 2 design (AHP, risk classes)\n"
-                "• Week 5: AHP weights with the consistency check, Jenks classification, "
-                "CGWB validation\n"
-                "• Week 5: EDA figures and the Streamlit dashboard\n"
-                "• Week 7: replaced the two random indicators with measured ones and added "
-                "the binary and rank validation measures\n\n"
-                "[Add the specific parts you personally wrote before printing]")
-    textbox(s, Inches(0.80), Inches(1.90), Inches(5.6), Inches(4.4), mine, size=12.5)
+    # Each person's own four contributions, read from the same list the written
+    # report uses, so the deck and the report cannot describe different work.
+    stu = CONTRIB.get(name, {})
+    mine = (f"{stu.get('module', '')}\nPrimary files: {stu.get('files', '')}\n\n"
+            + "\n".join("•  " + d for d in stu.get("did", [])))
+    textbox(s, Inches(0.80), Inches(1.90), Inches(5.6), Inches(4.4), mine, size=11)
     textbox(s, Inches(0.80), Inches(6.05), Inches(5.6), Inches(0.4),
             "Team: Koushik & Karthik — Module 1 · Nitin, Varshith & Chandrashekar — Module 2",
             size=10.5, italic=True, color=GREY)
     ph2 = [
         ["Pending work (~30%)", "Priority", "Approach", "Target"],
-        ["Kriging / IDW risk surface", "High", "PyKrige on district risk index", "Week 15"],
-        ["SHAP driver explanation", "High", "TreeExplainer on the XGBoost model", "Week 15"],
-        ["Direct multi-horizon forecasting", "High",
-         "One model per horizon, removing recursive drift", "Week 16"],
-        ["Rainfall and LULC indicators", "Medium",
-         "Integrate IMD grids and NRSC LULC, restore the 5-indicator AHP", "Week 17"],
-        ["Spatio-temporal model (Gap 3)", "Medium", "ConvLSTM / GCN-LSTM across wells", "Week 18"],
-        ["Dashboard deployment", "Low", "Streamlit Cloud for planners", "Week 19"],
+        ["Deep-well data for the 0.45 recall", "High",
+         "CGWB piezometer series + a depth-stratified indicator", "Week 18"],
+        ["Kriging risk surface", "High",
+         "Ordinary kriging over the 177 taluk centroids", "Week 17"],
+        ["SHAP driver explanation", "High",
+         "TreeSHAP on the selected XGBoost model, per station", "Week 17"],
+        ["Direct multi-horizon forecasting", "Medium",
+         "One model per horizon, removing recursive drift", "Week 18"],
+        ["Land-use change indicator", "Medium",
+         "Land-cover rasters; adds the deferred fifth indicator", "Week 19"],
+        ["Spatio-temporal model (Gap 3)", "Low",
+         "ConvLSTM / GCN-LSTM across wells", "Week 20"],
     ]
     add_table(s, Inches(6.78), Inches(1.30), Inches(5.98), Inches(3.4), ph2,
               col_w=[33, 14, 38, 15], font=10)

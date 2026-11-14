@@ -926,8 +926,8 @@ def build(stu: dict, D: dict) -> Path:
     pe = doc.add_paragraph()
     pe.add_run("Root cause and fix - important debugging example").bold = True
     for line in [
-        "Bug: the composite risk ranking placed Kolar, the most over-exploited district in "
-        "Karnataka, among the safest.",
+        "Bug: the composite risk ranking placed Chitradurga, an over-exploited district, "
+        "at the lowest risk, and showed most districts with rising water tables.",
         "Symptom: the pipeline ran cleanly and produced a plausible-looking map, so nothing "
         "signalled an error.",
         "Root cause: the decline-rate indicator came from the model's own recursive "
