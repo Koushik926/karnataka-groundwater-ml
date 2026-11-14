@@ -31,6 +31,7 @@ th { background: #D9E2F3; font-weight: bold; }
 .page-break { page-break-after: always; }
 .pb { page-break-before: always; }
 figure { margin: 10pt 0 12pt; text-align: center; page-break-inside: avoid; }
+figcaption { font-style: italic; font-size: 9.5pt; margin-top: 4pt; text-align: center; }
 figure img { max-width: 100%; height: auto; max-height: 11.5cm; }
 img { max-width: 100%; height: auto; max-height: 11.5cm; }
 ul, ol { margin: 6pt 0; padding-left: 20pt; }
@@ -179,6 +180,28 @@ li { margin: 3pt 0; }
 
     if in_code and code_lines:
         html_parts.append(f'<pre class="code">{chr(10).join(code_lines)}</pre>')
+
+    # --- pair each picture with the caption that follows it ---------------
+    # An image and its caption were two independent paragraphs, so a page break
+    # could fall between them: the Module-1 flowchart printed on one page and
+    # "Figure 4: ..." at the top of the next. Wrapping the pair in a <figure>
+    # (page-break-inside: avoid) keeps them together.
+    paired = []
+    i = 0
+    while i < len(html_parts):
+        chunk = html_parts[i]
+        nxt = html_parts[i + 1] if i + 1 < len(html_parts) else ''
+        is_img = chunk.startswith('<p class="center"><img') and chunk.endswith('</p>')
+        is_cap = re.match(r'<p[^>]*>\s*(<em>)?\s*Figure \d+[:.]', nxt or '')
+        if is_img and is_cap:
+            body = chunk[len('<p class="center">'):-len('</p>')]
+            cap = re.sub(r'^<p[^>]*>|</p>$', '', nxt)
+            paired.append(f'<figure>{body}<figcaption>{cap}</figcaption></figure>')
+            i += 2
+            continue
+        paired.append(chunk)
+        i += 1
+    html_parts = paired
 
     html_parts.append('</body></html>')
     html_content = '\n'.join(html_parts)

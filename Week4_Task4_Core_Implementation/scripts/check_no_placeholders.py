@@ -12,8 +12,11 @@ from pypdf import PdfReader
 from pptx import Presentation
 
 PAT = re.compile(
-    r"\[[^\]\n]{0,120}(add|insert|your|fill|paste|enter|screenshot|tbd|todo|xx)"
-    r"[^\]\n]{0,120}\]"                      # bracketed instruction
+    # any bracketed run of prose carrying an instruction verb, at any length -
+    # the first version capped each side at 120 characters and so walked past
+    # "[Draft, assembled from what you actually did ... in your own words ...]"
+    r"\[[^\]\n]{0,400}?\b(add|insert|your|fill|paste|enter|screenshot|rewrite|"
+    r"draft|correct anything|tbd|todo|xx)\b[^\]\n]{0,400}?\]"
     r"|before printing|to be filled|fill in|fill after|paste here|insert here"
     r"|enter actual|enter your|add your|\bTODO\b|\bTBD\b|\[TO FILL\]"
     r"|lorem ipsum|_{4,}|xxxx", re.I)

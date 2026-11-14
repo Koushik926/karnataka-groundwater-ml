@@ -592,12 +592,6 @@ def build(stu: dict) -> Path:
         "run the pipeline in one command.")
 
     doc.add_heading("5.3 Reflection (150–200 words)", 2)
-    p = doc.add_paragraph()
-    r = p.add_run(
-        "[Draft, assembled from what you actually did in Weeks 1–7. Read it, correct "
-        "anything that is not true of you, and rewrite it in your own words before "
-        "signing — this section is your reflection, not the team's.]")
-    r.italic = True
     doc.add_paragraph(stu["reflection"])
 
     doc.add_heading("5.4 Capstone showcase plan", 2)
