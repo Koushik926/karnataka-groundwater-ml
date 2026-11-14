@@ -1,4 +1,12 @@
-"""Broad placeholder sweep: anything that tells a human to supply content."""
+"""check_no_placeholders.py - refuse to ship a document that asks a human to fill it in.
+
+    python scripts/check_no_placeholders.py        # exit 1 if anything is found
+
+Run after every document build. A narrow word-list sweep missed
+"[Add the specific parts you personally wrote before printing]" on deck slide 13,
+so this matches the SHAPE of a placeholder - bracketed text containing an
+instruction verb, or a run of underscores - rather than a list of known phrases.
+"""
 import glob, re, sys, zipfile
 from pypdf import PdfReader
 from pptx import Presentation
