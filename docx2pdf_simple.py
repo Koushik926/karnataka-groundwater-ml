@@ -1,6 +1,9 @@
 """Simple DOCX to PDF converter using Chrome."""
 import sys
 import html
+import base64
+import mimetypes
+import re
 import subprocess
 import tempfile
 from pathlib import Path
@@ -14,8 +17,8 @@ def convert(docx_path, pdf_path):
     html_parts = ['''<!DOCTYPE html>
 <html><head><meta charset="utf-8">
 <style>
-@page { size: A4; margin: 2.54cm; }
-body { font-family: 'Times New Roman', serif; font-size: 12pt; line-height: 1.4; max-width: 21cm; margin: 0 auto; padding: 2cm; }
+@page { size: A4; margin: 2.2cm 2.0cm; }
+body { font-family: 'Times New Roman', serif; font-size: 12pt; line-height: 1.45; margin: 0; padding: 0; }
 h1 { font-size: 14pt; margin-top: 18pt; margin-bottom: 12pt; }
 h2 { font-size: 13pt; margin-top: 14pt; margin-bottom: 10pt; }
 p { margin: 6pt 0; text-align: justify; }
@@ -27,14 +30,61 @@ th { background: #D9E2F3; font-weight: bold; }
         padding: 8px; margin: 6pt 0; white-space: pre-wrap; border: 1px solid #ddd; }
 .page-break { page-break-after: always; }
 .pb { page-break-before: always; }
+figure { margin: 10pt 0 12pt; text-align: center; page-break-inside: avoid; }
+figure img { max-width: 100%; height: auto; max-height: 11.5cm; }
+img { max-width: 100%; height: auto; max-height: 11.5cm; }
 ul, ol { margin: 6pt 0; padding-left: 20pt; }
 li { margin: 3pt 0; }
 </style></head><body>
 ''']
 
+    def image_tag(run):
+        """Return an <img> for a run that carries a drawing, else ''.
+
+        python-docx has no public accessor for an inline image, so the
+        relationship id is read from the run's XML and resolved against the
+        document part. Without this the converter silently dropped every
+        figure: the DOCX held 22 images and the PDF held none, leaving every
+        caption printed under blank space.
+        """
+        xml = run._element.xml
+        if 'graphic' not in xml:
+            return ''
+        # <wp:extent cx=".." cy=".."> carries the size Word would render, in EMU.
+        style = ''
+        m = re.search(r'<wp:extent[^>]*cx="(\d+)"[^>]*cy="(\d+)"', xml)
+        if m:
+            w_pt = int(m.group(1)) / 12700.0
+            h_pt = int(m.group(2)) / 12700.0
+            style = f' style="width:{w_pt:.1f}pt;max-height:{h_pt:.1f}pt"'
+        out = []
+        for attr in ('r:embed', 'r:link'):
+            key = attr + '="'
+            start = 0
+            while True:
+                i = xml.find(key, start)
+                if i < 0:
+                    break
+                j = xml.index('"', i + len(key))
+                rid = xml[i + len(key):j]
+                start = j
+                part = doc.part.related_parts.get(rid)
+                if part is None:
+                    continue
+                blob = part.blob
+                ctype = getattr(part, 'content_type', '') or \
+                    mimetypes.guess_type(str(part.partname))[0] or 'image/png'
+                b64 = base64.b64encode(blob).decode('ascii')
+                out.append(f'<img{style} src="data:{ctype};base64,{b64}">')
+        return ''.join(out)
+
     def get_text(para):
         text = ''
         for run in para.runs:
+            img = image_tag(run)
+            if img:
+                text += img
+                continue
             t = html.escape(run.text)
             if run.bold:
                 t = f'<strong>{t}</strong>'
@@ -76,6 +126,9 @@ li { margin: 3pt 0; }
 
             if not text.strip():
                 continue
+            if text.lstrip().startswith('<img'):
+                emit(f'<p class="center">{text}</p>')
+                continue
 
             if para.style and para.style.name.startswith('Heading'):
                 if in_code and code_lines:
@@ -110,8 +163,17 @@ li { margin: 3pt 0; }
                 cells = []
                 tag = 'th' if i == 0 else 'td'
                 for cell in row.cells:
-                    cell_text = ' '.join(p.text for p in cell.paragraphs)
-                    cells.append(f'<{tag}>{html.escape(cell_text)}</{tag}>')
+                    # cells may hold pictures (the SDG tiles on the title page),
+                    # so build them the same way as body paragraphs
+                    parts = []
+                    for cp in cell.paragraphs:
+                        for r in cp.runs:
+                            img = image_tag(r)
+                            if img:
+                                parts.append(img)
+                        if cp.text.strip():
+                            parts.append(html.escape(cp.text))
+                    cells.append(f'<{tag}>{" ".join(parts)}</{tag}>')
                 rows_html.append('<tr>' + ''.join(cells) + '</tr>')
             emit('<table>' + ''.join(rows_html) + '</table>')
 

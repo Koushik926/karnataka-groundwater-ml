@@ -35,6 +35,7 @@ import literature as L
 PROJ = ROOT.parent
 OUTDIR = PROJ / "Phase1_Reports"
 W2, W3 = PROJ / "week2_diagrams", PROJ / "week3_diagrams"
+ASSETS = ROOT / "assets"
 FIGS = ROOT / "outputs" / "figures"
 
 GUIDE, LEAD = "Ms Indhuja Balakrishnan", "Dr. M. Shobha Rani"
@@ -221,24 +222,43 @@ def build(stu: dict, D: dict) -> Path:
     doc = Document()
     st = doc.styles["Normal"]; st.font.name = "Times New Roman"; st.font.size = Pt(11.5)
     for s in doc.sections:
-        s.top_margin = s.bottom_margin = Cm(2.2); s.left_margin = s.right_margin = Cm(2.2)
+        s.top_margin = s.bottom_margin = Cm(2.2); s.left_margin = s.right_margin = Cm(2.0)
 
     n = [0]   # running figure number
 
-    def fig(path: Path, caption: str, width=5.9):
-        """Place a figure and caption it with what the picture actually shows."""
+    MAX_W, MAX_H = 4.9, 4.4          # inches, so picture + caption share one page
+
+    def fig(path: Path, caption: str, width=MAX_W):
+        """Place a figure and caption it with what the picture actually shows.
+
+        Tall diagrams (the module flowcharts, the DFDs) are scaled by height
+        rather than width. Sized on width alone they ran over a page break and
+        left their caption stranded on an otherwise blank page.
+        """
         if not path.exists():
             return
         n[0] += 1
-        doc.add_picture(str(path), width=Inches(width))
+        try:
+            from PIL import Image
+            with Image.open(path) as im:
+                iw, ih = im.size
+            w = min(width, MAX_W)
+            if ih / iw * w > MAX_H:
+                w = MAX_H * iw / ih
+        except Exception:
+            w = min(width, MAX_W)
+        doc.add_picture(str(path), width=Inches(w))
         doc.paragraphs[-1].alignment = WD_ALIGN_PARAGRAPH.CENTER
         p = doc.add_paragraph(); p.alignment = WD_ALIGN_PARAGRAPH.CENTER
         r = p.add_run(f"Figure {n[0]}: {caption}")
         r.italic = True; r.font.size = Pt(9.5)
         doc.add_paragraph()
 
-    # ---------------- cover: only what the template asks for
-    centred(doc, "REVA University", 16, True)
+    # ---------------- cover: only what the template asks for, plus the
+    # university logo and the SDGs this problem statement addresses.
+    if (ASSETS / "reva_logo.png").exists():
+        doc.add_picture(str(ASSETS / "reva_logo.png"), width=Inches(2.9))
+        doc.paragraphs[-1].alignment = WD_ALIGN_PARAGRAPH.CENTER
     centred(doc, "School of Computer Science and Engineering", 12)
     doc.add_paragraph()
     centred(doc, "Major Project Report-Phase-1 Review", 14, True)
@@ -253,6 +273,24 @@ def build(stu: dict, D: dict) -> Path:
         ["Project title", TITLE],
         ["Faculty guide", GUIDE],
     ], fs=10.5)
+
+    doc.add_paragraph()
+    centred(doc, "Sustainable Development Goals addressed", 11, True)
+    # a plain centred paragraph, not a table - a one-row table renders as a
+    # shaded, bordered header row and boxes the logos in
+    p_logos = doc.add_paragraph(); p_logos.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    for i, img in enumerate(["sdg06.png", "sdg13.png"]):
+        if (ASSETS / img).exists():
+            if i:
+                p_logos.add_run("    ")
+            p_logos.add_run().add_picture(str(ASSETS / img), width=Inches(1.3))
+    p_sdg = doc.add_paragraph(); p_sdg.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    r_sdg = p_sdg.add_run(
+        "SDG 6, target 6.4 on water-use efficiency and 6.6 on water-related "
+        "ecosystems: the project measures where Karnataka's groundwater is being "
+        "withdrawn faster than it recovers. SDG 13: the risk index is driven in part "
+        "by rainfall dependence, which is how climate variability reaches the aquifer.")
+    r_sdg.font.size = Pt(9.5); r_sdg.italic = True
     doc.add_page_break()
 
     # ================================================================ 1
@@ -349,7 +387,8 @@ def build(stu: dict, D: dict) -> Path:
         "35 semi-critical, 10 critical, 52 over-exploited. The count is printed on each bar "
         "and the legend names each category.")
 
-    pe = doc.add_paragraph(); pe.add_run("Evidence 3: Research gap table.").bold = True
+    pe = doc.add_paragraph(); pe.add_run("Evidence 3: Research gap table. The K-Means cross-check and the kriging stage shown here are "
+        "Phase-2 items.").bold = True
     table(doc, ["Research gap", "Evidence from the literature", "How our project addresses it"],
           [[gap_title(i, g), g["evidence"], g["ours"]]
            for i, g in enumerate(L.GAPS, 1)], fs=8.5)
@@ -400,18 +439,23 @@ def build(stu: dict, D: dict) -> Path:
         "Module 2 consumes those trends to produce the taluk risk map, and the dashboard and "
         "the documents read the resulting files.")
     fig(W2 / "Fig1_Architecture.png",
-        "System architecture. Data sources (CGWB via India-WRIS, NASA POWER) feed the shared "
-        "data pipeline; Module 1 (prediction and trend analysis) writes station forecasts, "
-        "which Module 2 (AHP risk index, Jenks classification, CGWB validation) consumes; "
-        "the Streamlit dashboard and the generated reports read the same output files.")
+        "System architecture as designed in Week 2, in four layers: data sources, data "
+        "processing, the two model modules and the output layer, with a database beside "
+        "them. Four boxes are design intent rather than delivered Phase-1 code, and are "
+        "listed in section 3.4: rainfall came from NASA POWER rather than IMD; LULC maps, "
+        "SRTM terrain and the kriging stage are Phase-2; storage is CSV and JSON files in "
+        "outputs/ rather than PostgreSQL; and the LSTM is a benchmark, not the selected "
+        "model. Everything else on the diagram is built and running.")
 
     doc.add_heading("2.4 Detailed design: flowchart, UML and DFD", 2)
     doc.add_paragraph("A. Flowcharts - main logic of each module.")
     fig(W2 / "Fig4_Module1_Flowchart.png",
-        "Flowchart of Module 1. Load the CGWB export, clean and canonicalise names, attach "
-        "rainfall, build the 15 features, split chronologically, train Random Forest, "
-        "XGBoost and SVR against a persistence baseline, select on validation RMSE, then "
-        "compute the Mann-Kendall and Sen's-slope trend for every station.")
+        "Flowchart of Module 1: select wells with long enough records, run the trend "
+        "analysis, split chronologically, train the candidate models against the baseline, "
+        "evaluate on validation, and only then test on the held-out seasons. The LSTM and "
+        "SHAP boxes are drawn as designed; in Phase-1 the LSTM is a benchmark and SHAP is "
+        "deferred, as section 3.4 records. The delivered path is baseline, Random Forest, "
+        "XGBoost and SVR, with XGBoost selected on validation RMSE.")
     fig(W2 / "Fig5_Module2_Flowchart.png",
         "Flowchart of Module 2. Aggregate station trends to taluks, build the five measured "
         "indicators, normalise each one, apply the AHP weights, check the consistency ratio, "
@@ -437,10 +481,6 @@ def build(stu: dict, D: dict) -> Path:
         "UML class diagram of the data pipeline: the loader, cleaner, name canonicaliser, "
         "rainfall joiner and feature builder classes, with their attributes and the methods "
         "each one exposes.")
-    fig(W3 / "Fig12_Class_Model_Risk.png",
-        "UML class diagram of the model and risk layer: the trainer and model-selection "
-        "classes of Module 1 and the indicator, AHP-weighting, Jenks-classifier and "
-        "validator classes of Module 2.")
     fig(W2 / "Fig6_Sequence_Diagram.png",
         "UML sequence diagram. src/main.py calls the data processor, then run_module1(), "
         "which writes the station forecast file; main.py passes that file to run_module2(), "
@@ -541,13 +581,14 @@ def build(stu: dict, D: dict) -> Path:
     doc.add_heading("3.2 Key features implemented", 2)
 
     def feature(title, what, how, where, result):
+        """One key feature: what it does, how, the measured result, the file."""
         h = doc.add_paragraph(); h.add_run(title).bold = True
         doc.add_paragraph(what)
-        doc.add_paragraph("Implementation:")
-        for b in how:
+        for b in how[:3]:
             doc.add_paragraph(b, style="List Bullet")
-        pr = doc.add_paragraph(); pr.add_run("Result: ").bold = True; pr.add_run(result)
-        pm = doc.add_paragraph(); pm.add_run("Main component: ").bold = True; pm.add_run(where)
+        pr = doc.add_paragraph()
+        pr.add_run("Result: ").bold = True; pr.add_run(result)
+        pr.add_run("   Main component: ").bold = True; pr.add_run(where)
 
     feature("1. Data cleaning and canonicalisation",
             "The system converts the raw CGWB export into a clean, consistently named record set.",
@@ -624,10 +665,6 @@ def build(stu: dict, D: dict) -> Path:
         "Model comparison on the validation split. Each bar is one model's RMSE in metres, "
         "with the value printed on the bar; the persistence baseline is shown for reference "
         "and the selected model is XGBoost.")
-    fig(FIGS / "fig6_predicted_vs_actual.png",
-        "Predicted against actual groundwater depth on the held-out test period. Each point "
-        "is one station-quarter; the diagonal line is perfect prediction, so points near it "
-        "are accurate and the spread around it is the error the RMSE summarises.")
 
     feature("5. Trend analysis",
             "The system measures the direction and rate of change at every station.",
@@ -686,9 +723,6 @@ def build(stu: dict, D: dict) -> Path:
     doc.add_paragraph(
         f"{D['kolar']} of the top 25 are Kolar taluks. CGWB records 189% stage of extraction "
         f"in Kolar, the worst in the state, and the model was never shown those figures.")
-    fig(FIGS / "fig8_risk_class_distribution.png",
-        "Distribution of the 177 assessed taluks across the four Jenks risk classes. The "
-        "count is printed on each bar and the legend names the class each colour represents.")
     fig(FIGS / "fig9_risk_index_by_district.png",
         "Highest-risk taluks by composite risk index, with the index value printed beside "
         "each bar. Kolar taluks dominate the top of the ranking.")
@@ -706,10 +740,6 @@ def build(stu: dict, D: dict) -> Path:
             "src/action_briefs.py - recommend(); dashboard.py",
             "A one-page brief per taluk and an interactive map, station forecast view and "
             "CGWB validation view, all read live from the pipeline's own output.")
-    fig(FIGS / "fig1_district_mean_depth.png",
-        "Mean depth to groundwater by district, deepest first, with the value in metres "
-        "printed on each bar. This is the district view the dashboard map presents "
-        "spatially.")
 
     doc.add_heading("3.3 Code quality and optimization", 2)
     doc.add_paragraph(
@@ -785,11 +815,6 @@ def build(stu: dict, D: dict) -> Path:
         "The dashboard is the delivered interface. It reads models/ and outputs/ at run "
         "time, so what an examiner sees on screen is the result of the most recent pipeline "
         "run and cannot have been typed in.")
-    fig(FIGS / "fig3_seasonal_pattern.png",
-        "Seasonal pattern of groundwater depth by quarter, as shown on the dashboard's "
-        "trend view. Each point carries its value in metres; the pre-monsoon quarter is the "
-        "deepest and the post-monsoon quarter the shallowest, which is the recharge cycle "
-        "the model learns.")
     fig(FIGS / "fig11_cgwb_validation.png",
         "The dashboard's validation view: our High and Very High taluks against CGWB's "
         "critical and over-exploited taluks. The confusion matrix counts are printed on each "
@@ -1010,12 +1035,11 @@ def build(stu: dict, D: dict) -> Path:
         "Week 1-2: problem identification, the 20-paper literature survey, research-gap "
         "analysis and requirement capture.",
         "Week 2-3: system architecture, technology selection, flowcharts, UML and DFD.",
-        "Week 4-5: core implementation of both modules on real CGWB data, and the refinement "
-        "that replaced synthetic fallbacks and placeholder indicators with measured ones.",
-        "Week 6: test-case design and the 29-test suite, including sixteen regression tests.",
-        "Week 7: consolidation - Module 1 to Module 2 integration, CGWB validation, the "
-        "dashboard and the taluk action briefs.",
-        "Week 8 onwards: documentation, figure generation and Phase-1 review preparation.",
+        "Week 4-5: core implementation of both modules on real CGWB data, and the "
+        "refinement that replaced synthetic fallbacks and placeholder indicators with "
+        "measured ones.",
+        "Week 6-7: the 29-test suite, Module 1 to Module 2 integration, CGWB validation, "
+        "the dashboard and the taluk action briefs.",
     ]:
         doc.add_paragraph(wk, style="List Bullet")
 
@@ -1050,103 +1074,30 @@ def build(stu: dict, D: dict) -> Path:
     ])
 
     doc.add_paragraph()
-    pe = doc.add_paragraph(); pe.add_run("Evidence 1: Viva questions and answers").bold = True
-    qa = [
-        ("What is the title of your project?",
-         "Spatio-Temporal Prediction and Risk Mapping of Groundwater Depletion in Karnataka "
-         "Using Machine Learning. It predicts the next quarter's groundwater level at every "
-         "monitored station in Karnataka and converts the measured trends into a taluk-level "
-         "depletion-risk ranking."),
-        ("What is the main objective?",
-         "To give water authorities an up-to-date depletion-risk ranking rather than an "
-         "official assessment published years in arrears, and to make that ranking checkable "
-         "against CGWB's own independent assessment."),
-        ("Why did you choose this project?",
-         "Karnataka is the second most groundwater-stressed state in India: 62 of 227 "
-         "assessed taluks are critical or over-exploited, recharge is falling and extraction "
-         "is rising. The data to act earlier already exists; nobody was turning it into a "
-         "current risk picture."),
-        ("What data do you use, and where does it come from?",
-         "CGWB quarterly groundwater levels for Karnataka through India-WRIS: 123,632 raw "
-         "records cleaned to 123,391, from 2,769 stations across 28 districts, January 1996 "
-         "to August 2024. Rainfall is NASA POWER PRECTOTCORR daily precipitation over 105 "
-         "grid cells. CGWB's 2020 assessment of 227 taluks is used only for validation."),
-        ("How did you clean the data?",
-         "241 records were removed under two separate rules: 76 readings outside the "
-         "physical range of 0 to 100 m, and 165 records missing a level, a date or a "
-         "district. District names were canonicalised, which resolved 33 raw labels to the "
-         "28 real districts."),
-        ("Why is the train-test split chronological and not random?",
-         "The features include lagged groundwater levels. A random split puts a station's "
-         "future on both sides of the split, so the model scores well by memorising. With a "
-         "chronological split every test quarter falls strictly after every training quarter. "
-         "Our scores fell when we fixed this, which is the point."),
-        ("Why XGBoost and not an LSTM?",
-         "It was selected on validation RMSE against Random Forest, SVR and a persistence "
-         "baseline. On 15 tabular features sampled quarterly, a gradient-boosted tree "
-         "ensemble is the stronger and far cheaper choice, and the review by Tao et al. "
-         "(2022) reports the same. The LSTM is kept as a benchmark, not as the deliverable."),
-        ("How good is the model, and compared to what?",
-         f"Test RMSE {t['rmse']:.3f} m, MAE {t['mae']:.3f} m, R2 {t['r2']:.3f}, against a "
-         f"persistence baseline of RMSE {t['baseline_rmse']:.3f} m and R2 "
-         f"{t['baseline_r2']:.3f}. Beating 'next quarter equals this quarter' by 18% RMSE is "
-         f"the comparison that matters, because that baseline is what a planner would "
-         f"otherwise assume."),
-        ("Does rainfall actually help, or did you just add it?",
-         "It was tested. The identical model was trained with and without the five rainfall "
-         "features on the same chronological split: test R2 0.576 without, 0.632 with. While "
-         "running that test we found rain_monsoon was summing the in-progress monsoon, so an "
-         "August observation carried September's rain - a leak that had been inflating the "
-         "score."),
-        ("What is AHP and why use it?",
-         "The Analytic Hierarchy Process turns pairwise judgements about which indicator "
-         "matters more into weights, as the principal eigenvector of a Saaty 1-9 matrix. "
-         "There is no ground-truth risk label to regress on, so the judgement has to be made "
-         "explicitly; AHP also yields a consistency ratio, which is 0.0542 for our matrix, "
-         "below the 0.10 the method requires."),
-        ("Why Jenks natural breaks?",
-         "Jenks minimises within-class variance, so the four class boundaries fall at real "
-         "gaps in the risk distribution rather than at arbitrary round numbers."),
-        ("Your four-class agreement with CGWB is only 23.9%. Is the model wrong?",
-         "No - the two scales are not comparable by construction. Jenks gives classes "
-         "relative to Karnataka's own distribution, while CGWB's categories are absolute "
-         "national thresholds on stage of extraction. The honest comparison is binary, high "
-         "risk against not, which is 77.3%. We report both rather than only the flattering "
-         "one."),
-        ("Recall is 0.45. What are you missing, and why?",
-         "The 28 stressed taluks we miss are shallow, 5.25 m on average, and flat in the "
-         "well record despite 122% mean extraction. Those are deep-aquifer stress that a "
-         "shallow-well index cannot observe. It is a limitation of the monitoring network, "
-         "not a tuning problem, and tuning the thresholds to hide it would be dishonest."),
-        ("What is your key algorithm and its complexity?",
-         "Mann-Kendall with Sen's slope per station: O(n squared) in the readings per "
-         "station, about 45 quarters giving roughly 1,000 comparisons, run over 2,042 "
-         "stations. XGBoost training is O(trees x depth x rows). The whole pipeline runs in "
-         "under a minute on a laptop with no GPU (measured: 30 s)."),
-        ("How do you know no number in this report is made up?",
-         "Every number is read from models/ and outputs/ when the document is built, and "
-         "src/provenance.py refuses to build any document if the model metadata does not "
-         "record a CGWB data source. This exists because earlier reports did quote figures "
-         "from a synthetic fallback."),
-        ("What is left for Phase-2, and why?",
-         "Six items, listed in section 5.3. The first is the honest one: the 0.45 recall is "
-         "a data limitation that needs piezometer data, not a better model."),
-    ]
-    table(doc, ["Question", "Answer"], [[q, a] for q, a in qa], fs=8.5)
-
-    doc.add_paragraph()
-    pe = doc.add_paragraph(); pe.add_run("Evidence 2: Project explanation").bold = True
+    # ================================================================ References
+    doc.add_page_break()
+    doc.add_heading("References", 1)
     doc.add_paragraph(
-        "The two figures below are what we present at the viva: how the system is put "
-        "together, and what it concludes.")
-    fig(W2 / "Fig1_Architecture.png",
-        "System architecture used in the viva walk-through: CGWB and NASA POWER data into "
-        "the shared pipeline, Module 1 producing station forecasts and trends, Module 2 "
-        "producing the validated taluk risk map, and the dashboard reading both.")
-    fig(FIGS / "fig9_risk_index_by_district.png",
-        "The project's main output: the highest-risk taluks of Karnataka by composite risk "
-        "index, with the index printed beside each bar. Kolar taluks dominate, matching "
-        "CGWB's independently recorded 189% stage of extraction there.")
+        "The bracketed numbers used in section 1.3 refer to this list. All twenty "
+        "papers are the ones compared in section 1.2.")
+    for i, pap in enumerate(L.PAPERS, 1):
+        text = pap["paper"].replace(f"[{pap['no']}]", "").replace("  ", " ").strip()
+        rp = doc.add_paragraph()
+        rp.paragraph_format.left_indent = Cm(1.0)
+        rp.paragraph_format.first_line_indent = Cm(-1.0)
+        rp.paragraph_format.space_after = Pt(3)
+        run = rp.add_run(f"[{i}]  "); run.bold = True; run.font.size = Pt(10)
+        rp.add_run(text + ".").font.size = Pt(10)
+    doc.add_paragraph()
+    pd_ = doc.add_paragraph()
+    pd_.add_run("Data sources. ").bold = True
+    pd_.add_run(
+        "Central Ground Water Board, groundwater level monitoring data for Karnataka, "
+        "accessed through India Water Resources Information System (India-WRIS), "
+        "https://indiawris.gov.in. Central Ground Water Board, Dynamic Ground Water "
+        "Resources of India 2020, taluk-wise assessment for Karnataka. NASA Prediction "
+        "Of Worldwide Energy Resources (POWER), PRECTOTCORR daily precipitation, "
+        "https://power.larc.nasa.gov.")
 
     # ---------------- declaration
     doc.add_page_break()

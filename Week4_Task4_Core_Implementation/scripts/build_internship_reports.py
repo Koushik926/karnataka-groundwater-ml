@@ -26,7 +26,7 @@ from docx import Document
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
-from docx.shared import Cm, Pt
+from docx.shared import Cm, Inches, Pt
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
@@ -35,6 +35,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import student_personal as P
 PROJ = ROOT.parent
 OUTDIR = PROJ / "Phase1_Reports"
+ASSETS = ROOT / "assets"
 
 GUIDE = "Ms Indhuja Balakrishnan"
 LEAD = "Dr. M. Shobha Rani"
@@ -384,9 +385,11 @@ def build(stu: dict) -> Path:
     doc = Document()
     st = doc.styles["Normal"]; st.font.name = "Times New Roman"; st.font.size = Pt(11.5)
     for s in doc.sections:
-        s.top_margin = s.bottom_margin = Cm(2.2); s.left_margin = s.right_margin = Cm(2.2)
+        s.top_margin = s.bottom_margin = Cm(2.2); s.left_margin = s.right_margin = Cm(2.0)
 
-    centred(doc, "REVA University", 16, True)
+    if (ASSETS / "reva_logo.png").exists():
+        doc.add_picture(str(ASSETS / "reva_logo.png"), width=Inches(2.9))
+        doc.paragraphs[-1].alignment = WD_ALIGN_PARAGRAPH.CENTER
     centred(doc, "School of Computer Science and Engineering", 12)
     doc.add_paragraph()
     centred(doc, "Internship Report -Phase-1", 14, True)
@@ -400,6 +403,21 @@ def build(stu: dict) -> Path:
         ["Project title", TITLE],
         ["Faculty guide", GUIDE],
     ], fs=10.5)
+
+    doc.add_paragraph()
+    centred(doc, "Sustainable Development Goals addressed", 11, True)
+    p_logos = doc.add_paragraph(); p_logos.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    for i, img in enumerate(["sdg06.png", "sdg13.png"]):
+        if (ASSETS / img).exists():
+            if i:
+                p_logos.add_run("    ")
+            p_logos.add_run().add_picture(str(ASSETS / img), width=Inches(1.3))
+    pg = doc.add_paragraph(); pg.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    rg = pg.add_run(
+        "SDG 6, targets 6.4 and 6.6: the project measures where Karnataka's groundwater "
+        "is withdrawn faster than it recovers. SDG 13: rainfall dependence is one of the "
+        "five risk indicators, which is how climate variability reaches the aquifer.")
+    rg.font.size = Pt(9.5); rg.italic = True
     doc.add_page_break()
 
     # ================================================================ 1
