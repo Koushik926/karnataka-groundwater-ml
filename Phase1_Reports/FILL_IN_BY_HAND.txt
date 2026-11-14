@@ -1,0 +1,56 @@
+WHAT IS STILL MISSING
+Phase-1 Review, 14 November 2026, 1:30 PM
+=========================================================================
+
+ONE ITEM LEFT.  Everything else is filled in.
+
+Internship report 5.1, "Mock interview 1 (Week 7)" - the "Score / key
+feedback" and "What I will improve" columns.  That is the only ruled line
+left in any of the ten reports.  The date and topics are already filled from
+the RIO schedule (SL 7, 12 October 2026).  Options:
+  - give the score and one line of feedback from the signed sheet; or
+  - say the round was not held, and the row will read "not held" instead of
+    carrying a date.
+
+
+DECISIONS ALREADY APPLIED
+-------------------------------------------------------------------------
+Certification: removed from the report and the deck entirely - not left as a
+blank, not invented.
+
+Coding platform: printed only for those who have one (Koushik - HackerRank,
+Karthik - LeetCode).  For Nitin, Varshith and Chandrashekar the line is
+absent altogether; their 3.2 paragraph reads "Aptitude and coding-practice
+evidence: ... attached (Week-5 deliverable)" with no mention of a platform.
+
+Programmes differ across the team and are now correct per student:
+  Nitin, Koushik, Varshith  B.Tech CSIT - VII Sem, Sec B
+  Karthik                   B.Tech CSIT - VII Sem, Sec C
+  Chandrashekar             B.Tech ISE  - VII Sem, Sec A
+If your school writes "CSIT" or "ISE" differently on an official form, that
+is one line in scripts/student_personal.py (BRANCH).
+
+Names confirmed against the roll: NITIN G A (R23EJ088), R KOUSHIK
+(R23EJ096), S VARSHITH SAI (R23EJ100), BHIMISETTY KARTHIK (R23EJ168),
+G M CHANDRASHEKAR (R23EQ029).
+
+
+READ BEFORE YOU SIGN
+-------------------------------------------------------------------------
+Internship report 5.3, Reflection (150-200 words) - a draft is printed there,
+built only from what you actually did in Weeks 1-7.  Read it, correct
+anything untrue of you, and put it in your own words.
+
+Internship report 2.1 - the baseline and "now" ratings were set from what you
+demonstrably built.  They are a judgement, not a measurement.  Check your row
+against your Week-1 self-check and change any number you disagree with.
+
+Both reports - sign and date the declaration page.
+
+
+ON THE FOUR EVALUATION SHEETS  (Evaluation_Sheets/<NAME>/)
+-------------------------------------------------------------------------
+Already filled: Guide Name, Date 14.11.2026, Project Title, Program and
+Section, SRN, Student Name.
+Left blank on purpose: Designation, Time, and every mark column (a-e and
+Total).  The guide and the examiner complete those in the room.
