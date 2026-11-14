@@ -112,6 +112,15 @@ The decline-rate indicator comes from the **measured** Sen's slope, not from the
 
 2. *Recall 0.45.* The 28 stressed taluks we miss are shallow (5.25 m mean) and flat despite 122% mean extraction; the 23 we catch are deep (11.69 m) and declining. CGWB's monitored shallow wells refill each monsoon while the borewells causing the stress draw from a deeper aquifer. It is a limit of the monitoring network, not a tuning problem. Closing it needs piezometer data, which is the first Phase-2 item.
 
+## How the two modules are coupled
+
+Be precise about this - an examiner may ask to see the line. Two couplings:
+
+1. **By order.** `src/main.py` runs Module 1, then checks it produced trends and stops with an error if not, so Module 2 never scores data Module 1 failed to produce.
+2. **By a shared function.** `station_trends()` in `src/data_processor.py` - Mann-Kendall with tie correction plus Sen's slope - is what both modules rely on.
+
+The paths differ: `create_district_indicators()` takes Module 1's forecast trends directly as an argument, while the taluk path - the one producing the delivered risk map - calls `station_trends()` on the same cleaned observations rather than reading `outputs/module1_station_forecasts.csv`. The values are identical (same function, same data). Making the taluk path consume the file too is a Phase-2 tidy-up. **Do not claim the taluk risk map reads Module 1's output file** - it recomputes.
+
 ## Testing and defects
 
 29 tests, 29 passing, 0 failing (`python -m pytest tests/`, under 10 s). Functional, boundary and negative cases for both modules, one end-to-end integration test, and 16 regression tests each tied to a specific defect. The original 13 tests all ran on generated data and caught none of the real bugs, which is why the suite was rebuilt around real data.

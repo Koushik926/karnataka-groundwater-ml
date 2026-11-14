@@ -264,9 +264,7 @@ def deck(name: str) -> Path:
               f"Faculty Guide: {GUIDE}\n"
               "REVA Internship Opportunities (RIO)  |  14 November 2026",
               size=14, color=WHITE, spacing=1.5)
-    s.shapes.add_picture(str(D.SDG6), Inches(10.6), Inches(2.25), height=Inches(1.9))
-    D.textbox(s, Inches(10.25), Inches(4.30), Inches(2.6), Inches(0.5),
-              "Aligned to UN SDG 6", size=11, color=WHITE, align=PP_ALIGN.CENTER)
+    D.title_branding(s)
 
     # ---------- 2. organisation and team
     s = content("Organisation and Team")

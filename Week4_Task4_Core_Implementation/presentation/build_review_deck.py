@@ -195,6 +195,36 @@ def _contrib() -> dict:
 
 CONTRIB = _contrib()
 
+# ---------------------------------------------------------------- branding
+ASSETS = BASE / "assets"
+REVA_LOGO = ASSETS / "reva_logo.png"
+SDG_TILES = [ASSETS / "sdg06.png", ASSETS / "sdg13.png"]
+
+
+def title_branding(slide):
+    """REVA logo and the two SDG tiles on a title slide.
+
+    The logo is the university's own asset (orange wordmark over dark grey), so
+    it sits on a white plate - on the navy background the grey line would be
+    unreadable. Shared by both decks so the two title slides match.
+    """
+    if REVA_LOGO.exists():
+        plate = slide.shapes.add_shape(1, Inches(0.78), Inches(0.42),
+                                       Inches(3.35), Inches(1.02))
+        plate.fill.solid(); plate.fill.fore_color.rgb = WHITE
+        plate.line.fill.background(); plate.shadow.inherit = False
+        slide.shapes.add_picture(str(REVA_LOGO), Inches(0.95), Inches(0.56),
+                                 width=Inches(3.0))
+    tiles = [t for t in SDG_TILES if t.exists()]
+    for i, t in enumerate(tiles):
+        slide.shapes.add_picture(str(t), Inches(9.62 + i * 1.72), Inches(2.55),
+                                 height=Inches(1.6))
+    if tiles:
+        textbox(slide, Inches(9.42), Inches(4.32), Inches(3.3), Inches(0.5),
+                "Aligned to UN SDG 6 and SDG 13", size=11, color=WHITE,
+                align=PP_ALIGN.CENTER)
+
+
 def count_tests() -> int:
     """Count the test functions in tests/, so the deck cannot quote a stale total.
 
@@ -231,9 +261,7 @@ def build(name: str, srn: str, module: int) -> Path:
             "Faculty guide: Ms Indhuja Balakrishnan     Phase-1 review\n"
             "REVA Internship Opportunities (RIO)  |  14 November 2026",
             size=14, color=WHITE, spacing=1.5)
-    s.shapes.add_picture(str(SDG6), Inches(10.6), Inches(2.25), height=Inches(1.9))
-    textbox(s, Inches(10.25), Inches(4.30), Inches(2.6), Inches(0.5),
-            "Aligned to UN SDG 6", size=11, color=WHITE, align=PP_ALIGN.CENTER)
+    title_branding(s)
 
     # ---------- 2. problem + gaps
     s = content_slide(prs, "Problem Statement and Literature Gaps", name, srn)

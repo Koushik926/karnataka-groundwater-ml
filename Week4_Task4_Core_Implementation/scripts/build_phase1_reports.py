@@ -483,8 +483,10 @@ def build(stu: dict, D: dict) -> Path:
         "each one exposes.")
     fig(W2 / "Fig6_Sequence_Diagram.png",
         "UML sequence diagram. src/main.py calls the data processor, then run_module1(), "
-        "which writes the station forecast file; main.py passes that file to run_module2(), "
-        "which writes the risk mapping; the dashboard then reads both.")
+        "which writes the station forecast file; main.py then builds the taluk indicators "
+        "and calls run_module2(), which writes the risk mapping; the dashboard reads both. "
+        "Section 4.4 sets out exactly which values are passed between the two and which are "
+        "recomputed from the same shared function.")
 
     doc.add_paragraph("D. Data model.")
     fig(W3 / "Fig14_ER_Diagram.png",
@@ -968,11 +970,22 @@ def build(stu: dict, D: dict) -> Path:
 
     doc.add_heading("4.4 Integration of Module-1 and Module-2", 2)
     doc.add_paragraph(
-        "Module 1 writes outputs/module1_station_forecasts.csv, which carries each station's "
-        "Sen's slope, trend category, mean recent depth and coefficient of variation. "
-        "src/main.py passes that table to run_module2(), which aggregates stations to taluks "
-        "and builds the five indicators from it. The contract between the two modules is the "
-        "column set of that file, and TC13 exercises the whole chain end to end.")
+        "The two modules are coupled in two ways. First by order: src/main.py runs Module 1, "
+        "then checks that it produced trends and stops with an error if it did not, so "
+        "Module 2 never scores data Module 1 failed to produce. Second by a shared "
+        "computation: the trend both modules rely on is station_trends() in "
+        "src/data_processor.py, which implements Mann-Kendall with the tie correction and "
+        "Sen's slope.")
+    doc.add_paragraph(
+        "The two paths differ, and it is worth being precise about which is which. Module 1 "
+        "writes outputs/module1_station_forecasts.csv, carrying each station's Sen's slope, "
+        "trend category, mean recent depth and coefficient of variation; "
+        "create_district_indicators() takes those forecast trends directly as an argument. "
+        "The taluk path, which produces the delivered risk map, calls station_trends() on "
+        "the same cleaned observations rather than reading that file, so the slopes are "
+        "recomputed rather than passed. The values are identical because it is the same "
+        "function on the same data. Making the taluk path consume the file as well is a "
+        "Phase-2 tidy-up; TC13 already exercises the chain end to end.")
     doc.add_paragraph(
         "Two integration bugs were met. First, run_module2() was being called with no "
         "arguments, so it silently scored invented locations rather than Module 1's output; "

@@ -208,6 +208,22 @@ def main() -> Path:
     A("")
 
     # ---------------------------------------------------------------- testing
+    A("## How the two modules are coupled")
+    A("")
+    A("Be precise about this - an examiner may ask to see the line. Two couplings:")
+    A("")
+    A("1. **By order.** `src/main.py` runs Module 1, then checks it produced trends and "
+      "stops with an error if not, so Module 2 never scores data Module 1 failed to produce.")
+    A("2. **By a shared function.** `station_trends()` in `src/data_processor.py` - "
+      "Mann-Kendall with tie correction plus Sen's slope - is what both modules rely on.")
+    A("")
+    A("The paths differ: `create_district_indicators()` takes Module 1's forecast trends "
+      "directly as an argument, while the taluk path - the one producing the delivered risk "
+      "map - calls `station_trends()` on the same cleaned observations rather than reading "
+      "`outputs/module1_station_forecasts.csv`. The values are identical (same function, "
+      "same data). Making the taluk path consume the file too is a Phase-2 tidy-up. "
+      "**Do not claim the taluk risk map reads Module 1's output file** - it recomputes.")
+    A("")
     A("## Testing and defects")
     A("")
     A("29 tests, 29 passing, 0 failing (`python -m pytest tests/`, under 10 s). Functional, "

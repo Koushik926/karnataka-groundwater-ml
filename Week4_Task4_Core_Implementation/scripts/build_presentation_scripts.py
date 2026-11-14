@@ -109,8 +109,9 @@ SHARED = {
    "level 0 and level 1, the UML use case, class and sequence diagrams, and the "
    "entity-relationship model.",
    "The one to look at is the sequence diagram: main dot py calls the data processor, then "
-   "run_module1, which writes the station forecast file; main then passes that file to "
-   "run_module2. That file is the contract between the two modules.",
+   "run_module1, which writes the station forecast file, then builds the taluk indicators "
+   "and calls run_module2. Section 4.4 of my report says exactly which values are passed "
+   "between the two modules and which are recomputed from the same shared function.",
  ], "If asked how a diagram maps to code, name the file - that is the expected answer."),
 
  9: ("35 s", "Implementation Progress", [
@@ -154,7 +155,10 @@ SHARED = {
    "ran - a negative R-squared is worse than predicting the mean, so something had to be "
    "wrong. The fallback now raises, and a provenance guard blocks any report being built "
    "from synthetic metadata.",
-   "On integration: Module 1 writes the station forecast file, Module 2 consumes it. Two "
+   "On integration, the modules are coupled two ways: by order - main dot py runs Module 1 "
+   "first and stops if it produced no trends - and by a shared function, station_trends in "
+   "data_processor, which both rely on. The district path takes Module 1's trends as an "
+   "argument; the taluk path recomputes the same slopes from the same cleaned data. Two "
    "bugs there - run_module2 was called with no arguments so it scored invented locations, "
    "and the station-to-taluk join silently matched almost nothing. 176 of 177 taluks match "
    "now.",
